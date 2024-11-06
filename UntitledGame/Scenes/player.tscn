@@ -1,10 +1,15 @@
-[gd_scene load_steps=33 format=3 uid="uid://lx4see8egccu"]
+[gd_scene load_steps=38 format=3 uid="uid://lx4see8egccu"]
 
 [ext_resource type="Texture2D" uid="uid://t83mw34dpnck" path="res://Pixel Adventure/Main Characters/Ninja Frog/Idle (32x32).png" id="1_fttwg"]
-[ext_resource type="Script" path="res://Scenes/player.gd" id="1_xpe2f"]
+[ext_resource type="Script" path="res://Scripts/player.gd" id="1_ur5o3"]
 [ext_resource type="Texture2D" uid="uid://cfew1cgm60246" path="res://Pixel Adventure/Main Characters/Ninja Frog/Fall (32x32).png" id="2_it6sk"]
 [ext_resource type="Texture2D" uid="uid://pkwbs3c01ptn" path="res://Pixel Adventure/Main Characters/Ninja Frog/Jump (32x32).png" id="4_lqahp"]
 [ext_resource type="Texture2D" uid="uid://be7mjdseyk4al" path="res://Pixel Adventure/Main Characters/Ninja Frog/Run (32x32).png" id="5_mrlvx"]
+[ext_resource type="PackedScene" uid="uid://i51qc7ir5mdy" path="res://Scenes/Components/gravity_component.tscn" id="5_nm2bl"]
+[ext_resource type="PackedScene" uid="uid://djvqgxmsvraex" path="res://Scenes/Components/input_component.tscn" id="7_vbf7r"]
+[ext_resource type="PackedScene" uid="uid://ccqgm5wuqs4sx" path="res://Scenes/Components/movement_component.tscn" id="8_yhsfs"]
+[ext_resource type="PackedScene" uid="uid://75x0njeh485t" path="res://Scenes/Components/animation_component.tscn" id="9_fma4r"]
+[ext_resource type="PackedScene" uid="uid://b2ufy05wqtpv3" path="res://Scenes/Components/advanced_jump_component.tscn" id="10_x71lm"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_5hq0j"]
 atlas = ExtResource("2_it6sk")
@@ -204,20 +209,42 @@ animations = [{
 "speed": 7.0
 }]
 
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_7b366"]
-size = Vector2(51, 63.5)
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_dgvhv"]
+radius = 32.0
+height = 100.0
 
-[node name="CharacterBody2D" type="CharacterBody2D"]
-script = ExtResource("1_xpe2f")
+[node name="CharacterBody2D" type="CharacterBody2D" node_paths=PackedStringArray("gravity_component", "input_component", "movement_component", "animation_component", "jump_component")]
+script = ExtResource("1_ur5o3")
+gravity_component = NodePath("GravityComponent")
+input_component = NodePath("InputComponent")
+movement_component = NodePath("MovementComponent")
+animation_component = NodePath("AnimationComponent")
+jump_component = NodePath("AdvancedJumpComponent")
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
 texture_filter = 1
-position = Vector2(32, 32)
+position = Vector2(0, 2)
 scale = Vector2(3, 3)
 sprite_frames = SubResource("SpriteFrames_kxvqw")
-animation = &"PlayerFall"
+animation = &"PlayerIdle"
 speed_scale = 4.0
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
-position = Vector2(33, 48.25)
-shape = SubResource("RectangleShape2D_7b366")
+shape = SubResource("CapsuleShape2D_dgvhv")
+
+[node name="GravityComponent" parent="." instance=ExtResource("5_nm2bl")]
+gravity = 1200.0
+
+[node name="InputComponent" parent="." instance=ExtResource("7_vbf7r")]
+
+[node name="MovementComponent" parent="." instance=ExtResource("8_yhsfs")]
+speed = 400.0
+ground_accel_speed = 19.0
+ground_decel_speed = 30.0
+air_decel_speed = 6.0
+
+[node name="AnimationComponent" parent="." node_paths=PackedStringArray("sprite") instance=ExtResource("9_fma4r")]
+sprite = NodePath("../AnimatedSprite2D")
+
+[node name="AdvancedJumpComponent" parent="." instance=ExtResource("10_x71lm")]
+jump_velocity = -600.0
